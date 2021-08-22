@@ -15,13 +15,23 @@ func NewGame() Game {
 	return game
 }
 
-func (game *Game) Play(pos *Position) {
+func (game Game) GetCurrentPlayer() *Player {
 	var player *Player
 	if game.turn%2 == 0 {
 		player = &game.blackPlayer
 	} else {
 		player = &game.whitePlayer
 	}
+	return player
+}
+
+func (game *Game) CanPlay(pos *Position) bool {
+	player := game.GetCurrentPlayer()
+	return game.board.ValidPlay(player, pos)
+}
+
+func (game *Game) Play(pos *Position) {
+	player := game.GetCurrentPlayer()
 	game.board.Play(player, pos)
 	game.turn++
 }
