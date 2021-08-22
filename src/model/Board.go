@@ -22,110 +22,49 @@ func NewBoard() Board {
 	return board
 }
 
-func (board *Board) GetChainAux(playerColor byte, pos Position, chain map[Position]Position) { // maps are reference types
-	_, visited := chain[pos]
-	if visited {
+func (board *Board) CheckPosition(playerColor byte, pos Position, chain *Chain) {
+	if chain.HasPos(pos) {
 		return
 	}
 	if board.grid[pos.i][pos.j] == playerColor {
-		chain[pos] = pos
+		chain.AddPos(pos)
 		board.CheckNeighbours(playerColor, &pos, chain)
+	} else if board.grid[pos.i][pos.j] == EMPTY {
+		chain.AddLiberty()
+	} else {
+		chain.AddRival()
 	}
+
 }
 
-func (board *Board) CheckNeighbours(playerColor byte, pos *Position, chain map[Position]Position) {
-	var nextPos Position
+func (board *Board) CheckNeighbours(playerColor byte, pos *Position, chain *Chain) {
 	if 0 <= pos.i-1 && pos.i+1 <= BOARD_SIZE { // todo refactor
-		nextPos = Position{pos.i + 1, pos.j}
-		board.GetChainAux(playerColor, nextPos, chain)
-		nextPos = Position{pos.i - 1, pos.j}
-		board.GetChainAux(playerColor, nextPos, chain)
+		board.CheckPosition(playerColor, Position{pos.i + 1, pos.j}, chain)
+		board.CheckPosition(playerColor, Position{pos.i - 1, pos.j}, chain)
 	} else if BOARD_SIZE <= pos.i+1 {
-		nextPos = Position{pos.i - 1, pos.j}
-		board.GetChainAux(playerColor, nextPos, chain)
+		board.CheckPosition(playerColor, Position{pos.i - 1, pos.j}, chain)
 	} else { // pos.i - 1 < 0
-		nextPos = Position{pos.i + 1, pos.j}
-		board.GetChainAux(playerColor, nextPos, chain)
+		board.CheckPosition(playerColor, Position{pos.i + 1, pos.j}, chain)
 	}
 	if 0 <= pos.j-1 && pos.j+1 <= BOARD_SIZE {
-		nextPos = Position{pos.i, pos.j + 1}
-		board.GetChainAux(playerColor, nextPos, chain)
-		nextPos = Position{pos.i, pos.j - 1}
-		board.GetChainAux(playerColor, nextPos, chain)
+		board.CheckPosition(playerColor, Position{pos.i, pos.j + 1}, chain)
+		board.CheckPosition(playerColor, Position{pos.i, pos.j - 1}, chain)
 	} else if BOARD_SIZE <= pos.j+1 {
-		nextPos = Position{pos.i, pos.j - 1}
-		board.GetChainAux(playerColor, nextPos, chain)
+		board.CheckPosition(playerColor, Position{pos.i, pos.j - 1}, chain)
 	} else { // pos.j - 1 < 0
-		nextPos = Position{pos.i, pos.j + 1}
-		board.GetChainAux(playerColor, nextPos, chain)
+		board.CheckPosition(playerColor, Position{pos.i, pos.j + 1}, chain)
 	}
-}
-
-func (board *Board) GetChain(playerColor byte, pos *Position) map[Position]Position {
-
-	chain := make(map[Position]Position)
-	chain[*pos] = *pos
-	board.CheckNeighbours(playerColor, pos, chain)
-
-	return chain
-}
-
-func (board *Board) AddIfLiberty(pos Position, liberties *uint) {
-	if board.grid[pos.i][pos.j] == EMPTY {
-		*liberties++
-	}
-}
-
-func (board *Board) HasMoreThanOneLiberties(chain map[Position]Position) bool {
-	var liberties uint = 0
-	var nextPos Position
-	for pos := range chain {
-		if 0 <= pos.i-1 && pos.i+1 <= BOARD_SIZE { // todo refactor
-			nextPos = Position{pos.i + 1, pos.j}
-			board.AddIfLiberty(nextPos, &liberties)
-			nextPos = Position{pos.i - 1, pos.j}
-			board.AddIfLiberty(nextPos, &liberties)
-		} else if BOARD_SIZE <= pos.i+1 {
-			nextPos = Position{pos.i - 1, pos.j}
-			board.AddIfLiberty(nextPos, &liberties)
-		} else { // pos.i - 1 < 0
-			nextPos = Position{pos.i + 1, pos.j}
-			board.AddIfLiberty(nextPos, &liberties)
-		}
-		if 0 <= pos.j-1 && pos.j+1 <= BOARD_SIZE {
-			nextPos = Position{pos.i, pos.j + 1}
-			board.AddIfLiberty(nextPos, &liberties)
-			nextPos = Position{pos.i, pos.j - 1}
-			board.AddIfLiberty(nextPos, &liberties)
-		} else if BOARD_SIZE <= pos.j+1 {
-			nextPos = Position{pos.i, pos.j - 1}
-			board.AddIfLiberty(nextPos, &liberties)
-		} else { // pos.j - 1 < 0
-			nextPos = Position{pos.i, pos.j + 1}
-			board.AddIfLiberty(nextPos, &liberties)
-		}
-		if liberties > 1 {
-			return true
-		}
-	}
-	return false
 }
 
 func (board *Board) IsSuicide(playerColor byte, pos *Position) bool {
-	var rivalPlayerColor byte
-	if playerColor == BLACK {
-		rivalPlayerColor = WHITE
-	} else {
-		rivalPlayerColor = BLACK
-	}
-	chain := board.GetChain(playerColor, pos)
-
+	chain := NewChain(*pos)
+	board.CheckNeighbours(playerColor, pos, &chain)
 	// todo check special capture (9)
 
-	return board.HasMoreThanOneLiberties(chain)
+	return chain.liberties <= 1
 }
 
-func (board *Board) ValidPlay(player *Player, pos *Position) bool {
+func (board *Board) IsValidMove(player *Player, pos *Position) bool {
 	if BOARD_SIZE <= pos.i || BOARD_SIZE <= pos.j {
 		return false
 	}
@@ -144,7 +83,7 @@ func (board *Board) ValidPlay(player *Player, pos *Position) bool {
 
 func (board *Board) Play(player *Player, pos *Position) {
 
-	if !board.ValidPlay(player, pos) {
+	if !board.IsValidMove(player, pos) {
 		return
 	}
 

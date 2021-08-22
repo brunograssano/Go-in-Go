@@ -27,7 +27,7 @@ func (game Game) GetCurrentPlayer() *Player {
 
 func (game *Game) CanPlay(pos *Position) bool {
 	player := game.GetCurrentPlayer()
-	return game.board.ValidPlay(player, pos)
+	return game.board.IsValidMove(player, pos)
 }
 
 func (game *Game) Play(pos *Position) {
