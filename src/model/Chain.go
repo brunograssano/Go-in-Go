@@ -23,6 +23,16 @@ func (chain *Chain) HasPos(pos Position) bool {
 	return visited
 }
 
+func (chain *Chain) GetAmountOfRivalStones() uint {
+	return chain.amountOfRivalStones
+}
+
+func NewEmptyChain() Chain {
+	stones := make(map[Position]Position)
+	chain := Chain{stones, 0, 0}
+	return chain
+}
+
 func NewChain(initialPos Position) Chain {
 	stones := make(map[Position]Position)
 	chain := Chain{stones, 0, 0}

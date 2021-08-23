@@ -22,6 +22,13 @@ func NewBoard() Board {
 	return board
 }
 
+func GetOpposingColor(color byte) byte {
+	if color == BLACK {
+		return WHITE
+	}
+	return BLACK
+}
+
 func (board *Board) CheckPosition(playerColor byte, pos Position, chain *Chain) {
 	if chain.HasPos(pos) {
 		return
@@ -38,7 +45,7 @@ func (board *Board) CheckPosition(playerColor byte, pos Position, chain *Chain) 
 }
 
 func (board *Board) CheckNeighbours(playerColor byte, pos *Position, chain *Chain) {
-	if 0 <= pos.i-1 && pos.i+1 <= BOARD_SIZE { // todo refactor
+	if 0 <= pos.i-1 && pos.i+1 <= BOARD_SIZE {
 		board.CheckPosition(playerColor, Position{pos.i + 1, pos.j}, chain)
 		board.CheckPosition(playerColor, Position{pos.i - 1, pos.j}, chain)
 	} else if BOARD_SIZE <= pos.i+1 {
@@ -57,8 +64,10 @@ func (board *Board) CheckNeighbours(playerColor byte, pos *Position, chain *Chai
 }
 
 func (board *Board) IsSuicide(playerColor byte, pos *Position) bool {
-	chain := NewChain(*pos)
+	chain := NewEmptyChain()
+	chain.AddLiberty() // initial pos
 	board.CheckNeighbours(playerColor, pos, &chain)
+
 	// todo check special capture (9)
 
 	return chain.liberties <= 1
@@ -81,6 +90,24 @@ func (board *Board) IsValidMove(player *Player, pos *Position) bool {
 	return true
 }
 
+func (board *Board) RemoveStones(chain *Chain) {
+	for pos, _ := range chain.stones {
+		board.grid[pos.i][pos.j] = EMPTY
+	}
+}
+
+func (board *Board) CheckIfSurrounded(player *Player, pos Position) {
+	if board.grid[pos.i][pos.j] == EMPTY { // it may be captured with another chain, so we can skip this
+		return
+	}
+	chain := NewChain(pos)
+	board.CheckPosition(GetOpposingColor(player.color), Position{pos.i + 1, pos.j}, &chain)
+	if chain.liberties == 0 {
+		player.AddScore(chain.GetAmountOfRivalStones())
+		board.RemoveStones(&chain)
+	}
+}
+
 func (board *Board) Play(player *Player, pos *Position) {
 
 	if !board.IsValidMove(player, pos) {
@@ -90,6 +117,21 @@ func (board *Board) Play(player *Player, pos *Position) {
 	board.grid[pos.i][pos.j] = player.color
 	player.AddMove(*pos)
 
-	// todo check capturing
+	if 0 <= pos.i-1 && pos.i+1 <= BOARD_SIZE {
+		board.CheckIfSurrounded(player, Position{pos.i + 1, pos.j})
+		board.CheckIfSurrounded(player, Position{pos.i - 1, pos.j})
+	} else if BOARD_SIZE <= pos.i+1 {
+		board.CheckIfSurrounded(player, Position{pos.i - 1, pos.j})
+	} else { // pos.i - 1 < 0
+		board.CheckIfSurrounded(player, Position{pos.i + 1, pos.j})
+	}
+	if 0 <= pos.j-1 && pos.j+1 <= BOARD_SIZE {
+		board.CheckIfSurrounded(player, Position{pos.i, pos.j + 1})
+		board.CheckIfSurrounded(player, Position{pos.i, pos.j - 1})
+	} else if BOARD_SIZE <= pos.j+1 {
+		board.CheckIfSurrounded(player, Position{pos.i, pos.j - 1})
+	} else { // pos.j - 1 < 0
+		board.CheckIfSurrounded(player, Position{pos.i, pos.j + 1})
+	}
 
 }
