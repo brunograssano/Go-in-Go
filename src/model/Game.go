@@ -1,4 +1,4 @@
-package main
+package model
 
 const BLACK = 'B'
 const WHITE = 'W'
@@ -25,13 +25,19 @@ func (game Game) GetCurrentPlayer() *Player {
 	return player
 }
 
-func (game *Game) CanPlay(pos *Position) bool {
-	player := game.GetCurrentPlayer()
-	return game.board.IsValidMove(player, pos)
+func (game Game) GetPos(i uint, j uint) byte {
+	return game.board.grid[i][j]
 }
 
-func (game *Game) Play(pos *Position) {
+func (game *Game) CanPlay(i uint, j uint) bool {
+	pos := Position{i, j}
 	player := game.GetCurrentPlayer()
-	game.board.Play(player, pos)
+	return game.board.IsValidMove(player, &pos)
+}
+
+func (game *Game) Play(i uint, j uint) {
+	pos := Position{i, j}
+	player := game.GetCurrentPlayer()
+	game.board.Play(player, &pos)
 	game.turn++
 }

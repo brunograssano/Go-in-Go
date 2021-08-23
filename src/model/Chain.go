@@ -1,4 +1,4 @@
-package main
+package model
 
 type Chain struct {
 	stones              map[Position]Position
