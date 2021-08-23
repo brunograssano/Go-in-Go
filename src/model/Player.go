@@ -1,5 +1,7 @@
 package model
 
+const WHITE_EXTRA_POINTS uint = 7
+
 type Player struct {
 	score         uint
 	moves         uint
@@ -8,7 +10,11 @@ type Player struct {
 }
 
 func NewPlayer(color byte) Player {
-	player := Player{0, 0, color, make(map[Position]Position)}
+	var initialScore uint = 0
+	if color == WHITE {
+		initialScore = WHITE_EXTRA_POINTS
+	}
+	player := Player{initialScore, 0, color, make(map[Position]Position)}
 	return player
 }
 
@@ -18,10 +24,7 @@ func (player *Player) AddScore(points uint) {
 
 func (player *Player) RepeatingPosition(pos Position) bool {
 	pos, played := player.previousMoves[pos]
-	if played {
-		return true
-	}
-	return false
+	return played
 }
 
 func (player *Player) AddMove(pos Position) {

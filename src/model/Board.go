@@ -29,6 +29,13 @@ func GetOpposingColor(color byte) byte {
 	return BLACK
 }
 
+func (board *Board) GetPos(i uint, j uint) byte {
+	if BOARD_SIZE <= i || j <= BOARD_SIZE {
+		return EMPTY
+	}
+	return board.grid[i][j]
+}
+
 func (board *Board) CheckPosition(playerColor byte, pos Position, chain *Chain) {
 	if chain.HasPos(pos) {
 		return
@@ -70,10 +77,10 @@ func (board *Board) IsSuicide(playerColor byte, pos *Position) bool {
 
 	// todo check special capture (9)
 
-	return chain.liberties <= 1
+	return chain.GetLiberties() <= 1
 }
 
-func (board *Board) IsValidMove(player *Player, pos *Position) bool {
+func (board *Board) IsAValidMove(player *Player, pos *Position) bool {
 	if BOARD_SIZE <= pos.i || BOARD_SIZE <= pos.j {
 		return false
 	}
@@ -110,7 +117,7 @@ func (board *Board) CheckIfSurrounded(player *Player, pos Position) {
 
 func (board *Board) Play(player *Player, pos *Position) {
 
-	if !board.IsValidMove(player, pos) {
+	if !board.IsAValidMove(player, pos) {
 		return
 	}
 

@@ -27,6 +27,10 @@ func (chain *Chain) GetAmountOfRivalStones() uint {
 	return chain.amountOfRivalStones
 }
 
+func (chain *Chain) GetLiberties() uint {
+	return chain.liberties
+}
+
 func NewEmptyChain() Chain {
 	stones := make(map[Position]Position)
 	chain := Chain{stones, 0, 0}

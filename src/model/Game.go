@@ -7,7 +7,7 @@ type Game struct {
 	blackPlayer Player
 	whitePlayer Player
 	board       Board
-	turn        uint // todo wip
+	turn        uint
 }
 
 func NewGame() Game {
@@ -26,13 +26,13 @@ func (game Game) GetCurrentPlayer() *Player {
 }
 
 func (game Game) GetPos(i uint, j uint) byte {
-	return game.board.grid[i][j]
+	return game.board.GetPos(i, j)
 }
 
 func (game *Game) CanPlay(i uint, j uint) bool {
 	pos := Position{i, j}
 	player := game.GetCurrentPlayer()
-	return game.board.IsValidMove(player, &pos)
+	return game.board.IsAValidMove(player, &pos)
 }
 
 func (game *Game) Play(i uint, j uint) {
