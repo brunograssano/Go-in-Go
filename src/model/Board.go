@@ -30,7 +30,7 @@ func GetOpposingColor(color byte) byte {
 }
 
 func (board *Board) GetPos(i uint, j uint) byte {
-	if BOARD_SIZE <= i || j <= BOARD_SIZE {
+	if BOARD_SIZE <= i || BOARD_SIZE <= j {
 		return EMPTY
 	}
 	return board.grid[i][j]
