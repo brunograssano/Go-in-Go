@@ -1,7 +1,7 @@
 package model
 
-const BLACK = 'B'
-const WHITE = 'W'
+const BLACK byte = 'B'
+const WHITE byte = 'W'
 
 type Game struct {
 	blackPlayer Player
@@ -33,6 +33,10 @@ func (game *Game) CanPlay(i uint, j uint) bool {
 	pos := Position{i, j}
 	player := game.GetCurrentPlayer()
 	return game.board.IsAValidMove(player, &pos)
+}
+
+func (game *Game) PassTurn() {
+	game.turn++
 }
 
 func (game *Game) Play(i uint, j uint) {

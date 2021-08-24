@@ -1,7 +1,7 @@
 package model
 
-const EMPTY = ' '
-const BOARD_SIZE = 5
+const EMPTY byte = ' '
+const BOARD_SIZE uint = 5
 
 type Position struct {
 	i uint
@@ -52,7 +52,7 @@ func (board *Board) CheckPosition(playerColor byte, pos Position, chain *Chain) 
 }
 
 func (board *Board) CheckNeighbours(playerColor byte, pos *Position, chain *Chain) {
-	if 0 <= int(pos.i-1) && (pos.i+1 <= BOARD_SIZE) {
+	if 0 <= int(pos.i-1) && (pos.i+1 < BOARD_SIZE) {
 		board.CheckPosition(playerColor, Position{pos.i + 1, pos.j}, chain)
 		board.CheckPosition(playerColor, Position{pos.i - 1, pos.j}, chain)
 	} else if BOARD_SIZE <= pos.i+1 {
@@ -60,7 +60,7 @@ func (board *Board) CheckNeighbours(playerColor byte, pos *Position, chain *Chai
 	} else { // pos.i - 1 < 0
 		board.CheckPosition(playerColor, Position{pos.i + 1, pos.j}, chain)
 	}
-	if 0 <= int(pos.j-1) && (pos.j+1 <= BOARD_SIZE) {
+	if 0 <= int(pos.j-1) && (pos.j+1 < BOARD_SIZE) {
 		board.CheckPosition(playerColor, Position{pos.i, pos.j + 1}, chain)
 		board.CheckPosition(playerColor, Position{pos.i, pos.j - 1}, chain)
 	} else if BOARD_SIZE <= pos.j+1 {
@@ -124,7 +124,7 @@ func (board *Board) Play(player *Player, pos *Position) {
 	board.grid[pos.i][pos.j] = player.color
 	player.AddMove(*pos)
 
-	if 0 <= int(pos.i-1) && (pos.i+1) <= BOARD_SIZE {
+	if 0 <= int(pos.i-1) && (pos.i+1) < BOARD_SIZE {
 		board.CheckIfSurrounded(player, Position{pos.i + 1, pos.j})
 		board.CheckIfSurrounded(player, Position{pos.i - 1, pos.j})
 	} else if BOARD_SIZE <= pos.i+1 {
@@ -132,7 +132,7 @@ func (board *Board) Play(player *Player, pos *Position) {
 	} else { // pos.i - 1 < 0
 		board.CheckIfSurrounded(player, Position{pos.i + 1, pos.j})
 	}
-	if 0 <= int(pos.j-1) && (pos.j+1 <= BOARD_SIZE) {
+	if 0 <= int(pos.j-1) && (pos.j+1 < BOARD_SIZE) {
 		board.CheckIfSurrounded(player, Position{pos.i, pos.j + 1})
 		board.CheckIfSurrounded(player, Position{pos.i, pos.j - 1})
 	} else if BOARD_SIZE <= pos.j+1 {
