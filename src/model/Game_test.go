@@ -63,3 +63,34 @@ func TestOneBlackStoneIsSurroundedByThreeWhiteStones03(t *testing.T) {
 	assert.Equal(EMPTY, game.GetPos(0, 1), "Black stone in (0,1) was captured")
 	assert.Equal(WHITE, game.GetPos(0, 2), "White stone in (0,2)")
 }
+
+/*
+  0 1 2 3
+0   W W
+1 W B B W
+2   W W
+*/
+func TestTwoBlackStonesAreSurroundedByWhiteStones04(t *testing.T) {
+	assert := assert.New(t)
+	game := NewGame()
+
+	game.Play(1, 1) // Black
+	game.Play(0, 1) // White
+	game.Play(1, 2) // Black
+	game.Play(0, 2) // White
+	game.PassTurn() // Black
+	game.Play(1, 0) // White
+	game.PassTurn() // Black
+	game.Play(1, 3) // White
+	game.PassTurn() // Black
+	game.Play(2, 1) // White
+	game.PassTurn() // Black
+
+	assert.Equal(BLACK, game.GetPos(1, 1), "There is a black stone in (1,1)")
+	assert.Equal(BLACK, game.GetPos(1, 2), "There is a black stone in (1,2)")
+
+	game.Play(2, 2) // White
+
+	assert.Equal(EMPTY, game.GetPos(1, 1), "The black stone in (1,1) was captured")
+	assert.Equal(EMPTY, game.GetPos(1, 2), "The black stone in (1,2) was captured")
+}
