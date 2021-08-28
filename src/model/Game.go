@@ -1,7 +1,7 @@
 package model
 
-const BLACK byte = 'B'
-const WHITE byte = 'W'
+const BLACK rune = 'B'
+const WHITE rune = 'W'
 
 type Game struct {
 	blackPlayer Player
@@ -16,16 +16,13 @@ func NewGame() Game {
 }
 
 func (game Game) GetCurrentPlayer() *Player {
-	var player *Player
 	if game.turn%2 == 0 {
-		player = &game.blackPlayer
-	} else {
-		player = &game.whitePlayer
+		return &game.blackPlayer
 	}
-	return player
+	return &game.whitePlayer
 }
 
-func (game Game) GetPos(i uint, j uint) byte {
+func (game Game) GetPos(i uint, j uint) rune {
 	return game.board.GetPos(i, j)
 }
 

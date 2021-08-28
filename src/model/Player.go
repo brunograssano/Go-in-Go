@@ -5,11 +5,11 @@ const WHITE_EXTRA_POINTS uint = 7
 type Player struct {
 	score         uint
 	moves         uint
-	color         byte
+	color         rune
 	previousMoves map[Position]Position
 }
 
-func NewPlayer(color byte) Player {
+func NewPlayer(color rune) Player {
 	var initialScore uint = 0
 	if color == WHITE {
 		initialScore = WHITE_EXTRA_POINTS
@@ -29,4 +29,8 @@ func (player *Player) RepeatingPosition(pos Position) bool {
 
 func (player *Player) AddMove(pos Position) {
 	player.previousMoves[pos] = pos
+}
+
+func (player *Player) GetColor() rune {
+	return player.color
 }

@@ -1,6 +1,6 @@
 package model
 
-const EMPTY byte = ' '
+const EMPTY rune = ' '
 const BOARD_SIZE uint = 5
 
 type Position struct {
@@ -9,7 +9,7 @@ type Position struct {
 }
 
 type Board struct {
-	grid [BOARD_SIZE][BOARD_SIZE]byte
+	grid [BOARD_SIZE][BOARD_SIZE]rune
 }
 
 func NewBoard() Board {
@@ -22,21 +22,21 @@ func NewBoard() Board {
 	return board
 }
 
-func GetOpposingColor(color byte) byte {
+func GetOpposingColor(color rune) rune {
 	if color == BLACK {
 		return WHITE
 	}
 	return BLACK
 }
 
-func (board *Board) GetPos(i uint, j uint) byte {
+func (board *Board) GetPos(i uint, j uint) rune {
 	if BOARD_SIZE <= i || BOARD_SIZE <= j {
 		return EMPTY
 	}
 	return board.grid[i][j]
 }
 
-func (board *Board) CheckPosition(playerColor byte, pos Position, chain *Chain) {
+func (board *Board) CheckPosition(playerColor rune, pos Position, chain *Chain) {
 	if chain.HasPos(pos) {
 		return
 	}
@@ -51,7 +51,7 @@ func (board *Board) CheckPosition(playerColor byte, pos Position, chain *Chain) 
 
 }
 
-func (board *Board) CheckNeighbours(playerColor byte, pos *Position, chain *Chain) {
+func (board *Board) CheckNeighbours(playerColor rune, pos *Position, chain *Chain) {
 	if 0 <= int(pos.i-1) && (pos.i+1 < BOARD_SIZE) {
 		board.CheckPosition(playerColor, Position{pos.i + 1, pos.j}, chain)
 		board.CheckPosition(playerColor, Position{pos.i - 1, pos.j}, chain)
@@ -70,7 +70,7 @@ func (board *Board) CheckNeighbours(playerColor byte, pos *Position, chain *Chai
 	}
 }
 
-func (board *Board) IsSuicide(playerColor byte, pos *Position) bool {
+func (board *Board) IsSuicide(playerColor rune, pos *Position) bool {
 	chain := NewEmptyChain()
 	chain.AddLiberty() // initial pos
 	board.CheckNeighbours(playerColor, pos, &chain)
