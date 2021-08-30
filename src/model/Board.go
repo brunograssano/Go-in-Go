@@ -44,9 +44,9 @@ func (board *Board) CheckPosition(playerColor rune, pos Position, chain *Chain) 
 		chain.AddPos(pos)
 		board.CheckNeighbours(playerColor, &pos, chain)
 	} else if board.grid[pos.i][pos.j] == EMPTY {
-		chain.AddLiberty()
+		chain.AddLiberty(pos)
 	} else {
-		chain.AddRival()
+		chain.AddRival(pos)
 	}
 
 }
@@ -72,7 +72,7 @@ func (board *Board) CheckNeighbours(playerColor rune, pos *Position, chain *Chai
 
 func (board *Board) IsSuicide(playerColor rune, pos *Position) bool {
 	chain := NewEmptyChain()
-	chain.AddLiberty() // initial pos
+	chain.AddLiberty(*pos) // initial pos
 	board.CheckNeighbours(playerColor, pos, &chain)
 
 	// todo check special capture (9)
@@ -109,7 +109,7 @@ func (board *Board) CheckIfSurrounded(player *Player, pos Position) {
 	}
 	chain := NewChain(pos)
 	board.CheckNeighbours(GetOpposingColor(player.color), &pos, &chain)
-	if chain.liberties == 0 {
+	if !chain.HasAnyLiberties() {
 		player.AddScore(chain.GetAmountOfRivalStones())
 		board.RemoveStones(&chain)
 	}

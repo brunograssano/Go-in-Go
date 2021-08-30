@@ -17,13 +17,11 @@ func TestTheGameStartsEmpty01(t *testing.T) {
 }
 
 /*
-	1)		2)		3)		4)		5)
-  	0 1 .	0 1 .	0 1 .	0 1 .	0 1 .
-0  			B		B W		B W		  W
-1							W		W
-.
+  0 1
+0 B W
+1 W
 */
-func TestBlackIsSurroundedByWhiteOnTheBorders02(t *testing.T) {
+func TestBlackIsSurroundedByWhiteOnTheUpperLeftBorder02(t *testing.T) {
 	assert := assert.New(t)
 	game := NewGame()
 
@@ -41,11 +39,9 @@ func TestBlackIsSurroundedByWhiteOnTheBorders02(t *testing.T) {
 }
 
 /*
-	1)		2)		3)		4)		5)		6)
-  	0 1 2	0 1 2	0 1 2	0 1 2	0 1 2	0 1 2
-0  	  		  B		W B		W B W	W B W	W   W
-1									  W		  W
-.
+  0 1 2
+0 W B W
+1   W
 */
 func TestOneBlackStoneIsSurroundedByThreeWhiteStones03(t *testing.T) {
 	assert := assert.New(t)
@@ -93,4 +89,110 @@ func TestTwoBlackStonesAreSurroundedByWhiteStones04(t *testing.T) {
 
 	assert.Equal(EMPTY, game.GetPos(1, 1), "The black stone in (1,1) was captured")
 	assert.Equal(EMPTY, game.GetPos(1, 2), "The black stone in (1,2) was captured")
+}
+
+/*
+  0 1 2 3
+0   B B
+1 B W W B
+2   B W B
+3     B
+*/
+func TestThreeWhiteStonesAreSurroundedByBlackStones05(t *testing.T) {
+	assert := assert.New(t)
+	game := NewGame()
+
+	game.Play(0, 1) // Black
+	game.Play(1, 1) // White
+	game.Play(0, 2) // Black
+	game.Play(1, 2) // White
+	game.Play(1, 0) // Black
+	game.Play(2, 2) // White
+	game.Play(3, 2) // Black
+	game.PassTurn() // White
+	game.Play(2, 1) // Black
+	game.PassTurn() // White
+	game.Play(2, 3) // Black
+	game.PassTurn() // White
+
+	assert.Equal(WHITE, game.GetPos(1, 1), "There is a white stone in (1,1)")
+	assert.Equal(WHITE, game.GetPos(1, 2), "There is a white stone in (1,2)")
+	assert.Equal(WHITE, game.GetPos(2, 2), "There is a white stone in (2,2)")
+
+	game.Play(1, 3) // Black
+
+	assert.Equal(EMPTY, game.GetPos(1, 1), "The white stone in (1,1) was captured")
+	assert.Equal(EMPTY, game.GetPos(1, 2), "The white stone in (1,2) was captured")
+	assert.Equal(EMPTY, game.GetPos(2, 2), "The white stone in (2,2) was captured")
+}
+
+/* White tries to play (2,2)
+  0 1 2 3
+0   B B
+1 B W W B
+2   B   B
+3     B
+*/
+func TestYouCantCaptureYourselfIfYouAreSurrounded06(t *testing.T) {
+	assert := assert.New(t)
+	game := NewGame()
+
+	game.Play(0, 1) // Black
+	game.Play(1, 1) // White
+	game.Play(0, 2) // Black
+	game.Play(1, 2) // White
+	game.Play(1, 0) // Black
+	game.PassTurn() // White
+	game.Play(3, 2) // Black
+	game.PassTurn() // White
+	game.Play(2, 1) // Black
+	game.PassTurn() // White
+	game.Play(2, 3) // Black
+	game.PassTurn() // White
+	game.Play(1, 3) // Black
+
+	assert.Equal(EMPTY, game.GetPos(2, 2), "(2,2) is empty")
+	assert.False(game.CanPlay(2, 2), "(2,2) is not a valid move for white")
+	game.Play(2, 2) // White
+
+	assert.Equal(EMPTY, game.GetPos(2, 2), "(2,2) is still empty after playing it")
+}
+
+/* White tries to play (2,2)
+  0 1 2 3 4
+0 W X B W
+1 B B B B W
+2 W B W W
+3   W
+*/
+func TestSpecialCapture07(t *testing.T) {
+	assert := assert.New(t)
+	game := NewGame()
+
+	game.Play(0, 2) // Black
+	game.Play(0, 0) // White
+	game.Play(1, 0) // Black
+	game.Play(0, 3) // White
+	game.Play(1, 1) // Black
+	game.Play(2, 0) // White
+	game.Play(1, 2) // Black
+	game.Play(3, 1) // White
+	game.Play(2, 1) // Black
+	game.Play(2, 2) // White
+	game.Play(1, 3) // Black
+	game.Play(1, 4) // White
+	game.Play(1, 3) // Black
+	game.Play(2, 3) // White
+	game.PassTurn() // Black
+
+	assert.Equal(EMPTY, game.GetPos(0, 1), "(0,1) is empty")
+	assert.True(game.CanPlay(0, 1), "(0,1) is a valid move for white")
+	game.Play(0, 1) // White
+
+	assert.Equal(WHITE, game.GetPos(0, 1), "(0,1) belongs to White")
+	assert.Equal(WHITE, game.GetPos(0, 0), "(0,0) belongs to White")
+	assert.Equal(EMPTY, game.GetPos(0, 2), "(0,2) is empty")
+	assert.Equal(EMPTY, game.GetPos(1, 1), "(1,1) is empty")
+	assert.Equal(EMPTY, game.GetPos(1, 0), "(1,0) is empty")
+	assert.Equal(EMPTY, game.GetPos(2, 1), "(2,1) is empty")
 }
