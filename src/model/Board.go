@@ -70,12 +70,21 @@ func (board *Board) CheckNeighbours(playerColor rune, pos *Position, chain *Chai
 	}
 }
 
+func (board *Board) IsSpecialCapture(color rune, pos *Position) bool {
+	chain := NewEmptyChain()
+	chain.AddLiberty(*pos) // initial pos
+	board.CheckNeighbours(color, pos, &chain)
+	return chain.GetLiberties() <= 1
+}
+
 func (board *Board) IsSuicide(playerColor rune, pos *Position) bool {
 	chain := NewEmptyChain()
 	chain.AddLiberty(*pos) // initial pos
 	board.CheckNeighbours(playerColor, pos, &chain)
 
-	// todo check special capture (9)
+	if board.IsSpecialCapture(GetOpposingColor(playerColor), pos) {
+		return false
+	}
 
 	return chain.GetLiberties() <= 1
 }
