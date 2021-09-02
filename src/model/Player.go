@@ -34,3 +34,7 @@ func (player *Player) AddMove(pos Position) {
 func (player *Player) GetColor() rune {
 	return player.color
 }
+
+func (player *Player) GetScore() uint {
+	return player.score
+}

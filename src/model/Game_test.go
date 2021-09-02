@@ -158,7 +158,7 @@ func TestYouCantCaptureYourselfIfYouAreSurrounded06(t *testing.T) {
 	assert.Equal(EMPTY, game.GetPos(2, 2), "(2,2) is still empty after playing it")
 }
 
-/* White tries to play (2,2)
+/*
   0 1 2 3 4
 0 W X B W
 1 B B B B W
@@ -195,4 +195,66 @@ func TestSpecialCapture07(t *testing.T) {
 	assert.Equal(EMPTY, game.GetPos(1, 1), "(1,1) is empty")
 	assert.Equal(EMPTY, game.GetPos(1, 0), "(1,0) is empty")
 	assert.Equal(EMPTY, game.GetPos(2, 1), "(2,1) is empty")
+}
+
+/*
+  0 1 2 3 4
+0 b b b B W
+1 B B B B W
+2 W W W W w
+3 w w w w w
+4 w w w w w
+*/
+func TestBlackCapturesThreeTerritoriesWhileWhiteCapturesElevenAtTheEndOfTheGame(t *testing.T) {
+	assert := assert.New(t)
+	game := NewGame()
+
+	game.Play(1, 0) // Black
+	game.Play(2, 0) // White
+	game.Play(1, 1) // Black
+	game.Play(2, 1) // White
+	game.Play(1, 2) // Black
+	game.Play(2, 2) // White
+	game.Play(1, 3) // Black
+	game.Play(2, 3) // White
+	game.Play(0, 3) // Black
+	game.Play(0, 4) // White
+	game.PassTurn() // Black
+	game.Play(1, 4) // White
+
+	blackScore, whiteScore := game.GetScore()
+
+	assert.Equal(uint(3), blackScore, "Black has 3 points")
+	assert.Equal(11+WHITE_EXTRA_POINTS, whiteScore, "White has %d points", 11+WHITE_EXTRA_POINTS)
+
+}
+
+/*
+  0 1 2 3 4
+0 b b b b b
+1 B B B B B
+2 W W W W W
+3 w w w w w
+4 w w w w w
+*/
+func TestBlackCapturesFiveTerritoriesWhileWhiteCapturesTenAtTheEndOfTheGame(t *testing.T) {
+	assert := assert.New(t)
+	game := NewGame()
+
+	game.Play(1, 0) // Black
+	game.Play(2, 0) // White
+	game.Play(1, 1) // Black
+	game.Play(2, 1) // White
+	game.Play(1, 2) // Black
+	game.Play(2, 2) // White
+	game.Play(1, 3) // Black
+	game.Play(2, 3) // White
+	game.Play(1, 4) // Black
+	game.Play(2, 4) // White
+
+	blackScore, whiteScore := game.GetScore()
+
+	assert.Equal(uint(5), blackScore, "Black has 5 points")
+	assert.Equal(10+WHITE_EXTRA_POINTS, whiteScore, "White has %d points", 10+WHITE_EXTRA_POINTS)
+
 }
