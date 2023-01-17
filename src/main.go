@@ -1,14 +1,17 @@
 package main
 
 import (
-	"./model"
 	"bufio"
 	"fmt"
 	"os"
 	"strconv"
+
+	"./model"
 )
 
 const EXIT byte = 'E'
+const PLAY byte = 'P'
+const PASS byte = 'S'
 
 func PrintBoard(game *model.Game) {
 	var i, j uint
@@ -72,14 +75,40 @@ func PrintInfo(game *model.Game) {
 	fmt.Printf(turnMessage)
 }
 
+func PrintInstructions() {
+	fmt.Printf("Please choose next action:\n")
+	fmt.Printf("P - Play the turn\n")
+	fmt.Printf("S - Pass the turn\n")
+	fmt.Printf("E - Exit the game\n")
+}
+
+func ReadAction() byte {
+	reader := bufio.NewReader(os.Stdin)
+	char, _, err := reader.ReadRune()
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = reader.Discard(reader.Buffered())
+	if err != nil {
+		fmt.Println(err)
+	}
+	return byte(char)
+}
+
 func GameLoop() {
 	var entry byte
 	game := model.NewGame()
-	for entry != EXIT { // todo finish the game, pass turn, display winner
+	for entry != EXIT { // todo display winner
+		PrintInstructions()
 		PrintBoard(&game)
 		PrintInfo(&game)
-		i, j := ReadInput(&game)
-		game.Play(i, j)
+		entry = ReadAction()
+		if entry == PASS {
+			game.PassTurn()
+		} else if entry == PLAY {
+			i, j := ReadInput(&game)
+			game.Play(i, j)
+		}
 	}
 }
 
